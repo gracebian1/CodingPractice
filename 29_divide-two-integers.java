@@ -3,7 +3,7 @@ class Solution {
         int sign = 1;
         if ((dividend > 0 && divisor < 0) || (dividend < 0 && divisor > 0))
             sign = -1;
-        //use long to avoid overflow
+
         long ldividend = Math.abs((long) dividend);
         long ldivisor = Math.abs((long) divisor);
         
@@ -21,18 +21,14 @@ class Solution {
     }
     
     private long ldivide (long ldividend, long ldivisor){
-        //Recursion exist condition
         if (ldividend < ldivisor)   return 0;
-        //Find the largest multiple so that (divisor * multiple <= dividend),
-        //we are moving with stride 1, 2, 4, 6, 16...2^n for fast search.
-        //Similar to binary search
         long sum = ldivisor;
         long multiple = 1;
         while ((sum + sum) < ldividend){
             sum += sum;
             multiple += multiple;
         }
-        //look for additional value for multiplication the reminder (dividend - sum) recursively
+        
         return multiple + ldivide(ldividend - sum, ldivisor);
     }
 }
