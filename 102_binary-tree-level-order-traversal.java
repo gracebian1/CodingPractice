@@ -14,52 +14,52 @@
  * }
  */
 class Solution {
-    
-    // Iterative:
+    // Time : O(n); Space: O(n)
+    /*
     public List<List<Integer>> levelOrder(TreeNode root) {
         List<List<Integer>> result = new ArrayList<>();
-        if(root == null) return result;
+        if (root == null)
+            return result;
         
         Queue<TreeNode> queue = new LinkedList<>();
         queue.offer(root);
         
-        while(!queue.isEmpty()){
-            List<Integer> level = new ArrayList<>();
+        while (!queue.isEmpty()) {
             int size = queue.size();
-        
-            for(int i = 0; i < size; i++){
+            List<Integer> temp = new ArrayList<>();
+            
+            for (int i = 0; i < size; i++) {
                 TreeNode curr = queue.poll();
-                level.add(curr.val);
-                
-                if(curr.left != null)
+                temp.add(curr.val);
+            
+                if (curr.left != null)
                     queue.offer(curr.left);
-                
-                if(curr.right != null)
-                    queue.offer(curr.right);  
+                if (curr.right != null)
+                    queue.offer(curr.right);
             }
-            result.add(level);
+            result.add(temp);
         }
         return result;
     }
-    /*
-    // Recursive:
-    public List<List<Integer>> levelOrder(TreeNode root){
+    */
+    public List<List<Integer>> levelOrder(TreeNode root) {
         List<List<Integer>> result = new ArrayList<>();
-        helper(result, root, 0);
-        return result;   
+        helper(root, result, 0);
+        return result;
     }
     
-    private void helper(List<List<Integer>> result, TreeNode node, int level){
-        if(node == null) return;
-        if(result.size() <= level){
-            List<Integer> temp = new ArrayList<>();
-            temp.add(node.val);
-            result.add(temp);
-        }else{
-            result.get(level).add(node.val);
-        }
-        helper(result, node.left, level+1);
-        helper(result, node.right, level+1);
+    private static void helper(TreeNode node, List<List<Integer>> result, int level) {
+        if (node == null)
+            return;
+        
+        if (result.size() == level) {
+            result.add(new ArrayList<Integer>()); 
+        } 
+        result.get(level).add(node.val);
+        
+        if (node.left != null)
+            helper(node.left, result, level + 1);
+        if (node.right != null)
+            helper(node.right, result, level + 1);
     }
-    */
 }
