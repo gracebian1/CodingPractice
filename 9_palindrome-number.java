@@ -1,16 +1,21 @@
 class Solution {
     public boolean isPalindrome(int x) {
-        // negative numbers do not fit
         if (x < 0) return false;
-        // single digit numbers fit
-        if (x / 10 == 0) return true;
+        if (x / 10 == 0) return true;       // single digit number 
         
-        int a = x, newX = 0;
-        while(a > 0){
-            // reverse the original number digit by digit
-            newX = newX * 10 + a % 10;
-            a = a / 10;
-        }   
-        return newX == x;
+        int reverse = 0;
+        int dummy = x;
+        
+        while (dummy != 0) {
+            int tail = dummy % 10;
+            int newX = reverse * 10 + tail;
+            
+            // Check for possible overflow
+            if ((newX - tail) / 10 != reverse) return false;
+            
+            reverse = newX;
+            dummy = dummy / 10;
+        }
+        return (x == reverse);
     }
 }
