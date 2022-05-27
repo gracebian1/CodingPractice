@@ -1,47 +1,111 @@
 class Solution {
+    // Node in-degree: Time: O(V+E), Space: O(V+E)
+    // In-degree 0 --> a vertex with NO incoming edges
+    
     public int[] findOrder(int numCourses, int[][] prerequisites) {
-        // Check if DAG (could be topologically sorted)
-        // Map key: starting node; Map value: adjacency list
-        Map<Integer, List<Integer>> edgeMap = new HashMap<>();
+        int[] topologicalOrder = new int[numCourses];
         
-        // Put node and its adjacency list into map
+        // Key: source; Value: list of destination
+        Map<Integer, List<Integer>> adjacencyList = new HashMap<>();
+        
+        // Key: index of destination; Value: in-degree
+        Map<Integer, Integer> indegreeMap = new HashMap<>();
+        for (int i = 0; i < numCourses; i++) {
+            indegreeMap.put(i, 0);
+        }
+        
+        // Adjacency list to represent the graph
         for (int i = 0; i < prerequisites.length; i++) {
-            if (!edgeMap.containsKey(prerequisites[i][0]))
-                edgeMap.put(prerequisites[i][0], new ArrayList<>());
+            int src = prerequisites[i][1];
+            int dest = prerequisites[i][0];
             
-            edgeMap.get(prerequisites[i][0]).add(prerequisites[i][1]);
+            adjacencyList.putIfAbsent(src, new ArrayList<Integer>());
+            adjacencyList.get(src).add(dest);
+
+            // In-degree for each vertex
+            indegreeMap.put(dest, indegreeMap.get(dest) + 1);
+        }
+        
+        // Add all vertices with 0 in-degree to the queue
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (indegreeMap.containsKey(i) && indegreeMap.get(i) == 0) {
+                queue.add(i);
+            }
+        }
+
+        int i = 0;
+        while (!queue.isEmpty()) {
+            int course = queue.poll();
+            topologicalOrder[i] = course;
+            i++;
+
+            // Reduce the in-degree of each neighbor by 1
+            if (adjacencyList.containsKey(course)) {
+                for (int neighbor: adjacencyList.get(course)) {
+                    indegreeMap.put(neighbor, indegreeMap.get(neighbor) - 1);
+
+                    if (indegreeMap.containsKey(neighbor) && indegreeMap.get(neighbor) == 0) {
+                        queue.add(neighbor);
+                    }
+                }
+            }
+        }
+
+        if (i == numCourses) {
+            return topologicalOrder;
+        }
+        return new int[]{};
+    }
+
+    /*
+    // DFS: Check if DAG (could be topologically sorted)
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        
+        // Key: source; Value: list of destination
+        Map<Integer, List<Integer>> adjacencyList = new HashMap<>();
+        
+        for (int i = 0; i < prerequisites.length; i++) {
+            int src = prerequisites[i][1];
+            int dest = prerequisites[i][0];
+            
+            adjacencyList.putIfAbsent(src, new ArrayList<>());
+            adjacencyList.get(src).add(dest);
         }
         
         List<Integer> list = new ArrayList<>();
         Set<Integer> visitedSet = new HashSet<>();
         boolean[] memo = new boolean[numCourses];
         
-        // Call dfs on each course recursively
         for (int i = 0; i < numCourses; i++) {
-            if (!dfs(edgeMap, visitedSet, memo, list, i)) 
-                return new int[0];
+            if (!dfs(adjacencyList, visitedSet, memo, list, i)) 
+                return new int[]{};
         }
         
-        // Result array
-        int[] result = new int[numCourses];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = list.get(i);
+        int[] topologicalOrder = new int[numCourses];
+        int j = list.size() - 1;
+         
+        for (int i = 0; i < numCourses; i++) {
+            topologicalOrder[i] = list.get(j);
+            j--;
         }
-        return result;
+        return topologicalOrder;
     }
     
-    private static boolean dfs(Map<Integer, List<Integer>> edgeMap, Set<Integer> visitedSet, boolean[] memo, List<Integer> list, int n) {
-        // Set contains node indicating a cycle
-        if (visitedSet.contains(n)) return false;
+    private static boolean dfs(Map<Integer, List<Integer>> adjacencyList, Set<Integer> visitedSet, boolean[] memo, List<Integer> list, int n) {
+        // If set already contains node, indicates a cycle
+        if (visitedSet.contains(n)) 
+            return false;
         
-        // Fully explored node
-        if (memo[n]) return true;
+        // Fully explored node (no need to go further beyond)
+        if (memo[n]) 
+            return true;
         
         visitedSet.add(n);
         
-        if (edgeMap.get(n) != null) {
-            for (int i: edgeMap.get(n)) {
-                if (!dfs(edgeMap, visitedSet, memo, list, i))
+        if (adjacencyList.containsKey(n)) {
+            for (int neighbor: adjacencyList.get(n)) {
+                if (!dfs(adjacencyList, visitedSet, memo, list, neighbor))
                     return false;
             }
         }
@@ -49,9 +113,9 @@ class Solution {
         visitedSet.remove(n);
         
         memo[n] = true;
-        
-        // Add node to arraylist
+
         list.add(n);
         return true;
     }
+    */
 }
