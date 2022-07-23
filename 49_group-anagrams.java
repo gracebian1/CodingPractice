@@ -1,20 +1,36 @@
 class Solution {
+    // Time: O(m*n): m: maximum len of a string, n: len of strs
+    // Space: O(m*n)
+    
     public List<List<String>> groupAnagrams(String[] strs) {
-        if (strs == null || strs.length == 0) 
-            return new ArrayList<List<String>>();
+        if (strs == null || strs.length == 0)
+            return new ArrayList<>();
         
+        // key: "#1#0#0#0#1..#1..#0"; value: ["ate", "eat", "tea"]
         Map<String, List<String>> map = new HashMap<>();
         
-        for (String string : strs){
-            char[] ca = string.toCharArray();
-            Arrays.sort(ca);
-            String keyString = String.valueOf(ca);
+        int[] bucket = new int[26];
+        
+        for (String s: strs) {
+            Arrays.fill(bucket, 0);
             
-            if (!map.containsKey(keyString)){
-                map.put(keyString, new ArrayList<String>());
+            for (char c: s.toCharArray()) {
+                bucket[c - 'a']++;
             }
-            map.get(keyString).add(string);
+            
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 26; i++) {
+                sb.append('#');
+                sb.append(bucket[i]);
+            }
+            
+            String key = sb.toString();
+            
+            if (!map.containsKey(key)) {
+                map.put(key, new ArrayList<>());
+            }
+            map.get(key).add(s);
         }
-        return new ArrayList<List<String>>(map.values());
+        return new ArrayList<>(map.values());
     }
 }
